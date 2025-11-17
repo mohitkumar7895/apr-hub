@@ -1,20 +1,85 @@
-import { DollarSign, ShoppingCart, Users, TrendingUp, Eye, MousePointer } from 'lucide-react';
+import { DollarSign, ShoppingCart, Users, TrendingUp, Eye, MousePointer, Target, Zap } from 'lucide-react';
 
-// Generate random data for different time ranges
-const generateData = (timeRange) => {
+// Generate user-specific seed based on user ID/email for consistent data
+const getUserSeed = (userId) => {
+  if (!userId) return 0;
+  let hash = 0;
+  const str = userId.toString();
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash);
+};
+
+// Generate random data for different time ranges with user-specific variations
+const generateData = (timeRange, userId = null) => {
+  const seed = getUserSeed(userId);
+  const userMultiplier = 0.8 + (seed % 40) / 100; // 0.8 to 1.2 multiplier
+  // Base values with user-specific variations (keep as numbers, format later)
   const baseValues = {
-    last7days: { revenue: 24568, orders: 1234, aov: 124.50, conversion: 3.2 },
-    last30days: { revenue: 85690, orders: 4321, aov: 128.75, conversion: 3.5 },
-    last90days: { revenue: 245600, orders: 12890, aov: 132.20, conversion: 3.8 }
+    last7days: { 
+      revenue: Math.round(24568 * userMultiplier), 
+      orders: Math.round(1234 * userMultiplier), 
+      aov: parseFloat((124.50 * userMultiplier).toFixed(2)), 
+      conversion: parseFloat((3.2 + (seed % 10) / 10).toFixed(1)),
+      returningCustomerRate: parseFloat((25 + (seed % 20)).toFixed(1)),
+      impressions: Math.round(125000 * userMultiplier),
+      purchasesFromAds: Math.round(456 * userMultiplier)
+    },
+    last30days: { 
+      revenue: Math.round(85690 * userMultiplier), 
+      orders: Math.round(4321 * userMultiplier), 
+      aov: parseFloat((128.75 * userMultiplier).toFixed(2)), 
+      conversion: parseFloat((3.5 + (seed % 10) / 10).toFixed(1)),
+      returningCustomerRate: parseFloat((28 + (seed % 20)).toFixed(1)),
+      impressions: Math.round(450000 * userMultiplier),
+      purchasesFromAds: Math.round(1890 * userMultiplier)
+    },
+    last90days: { 
+      revenue: Math.round(245600 * userMultiplier), 
+      orders: Math.round(12890 * userMultiplier), 
+      aov: parseFloat((132.20 * userMultiplier).toFixed(2)), 
+      conversion: parseFloat((3.8 + (seed % 10) / 10).toFixed(1)),
+      returningCustomerRate: parseFloat((32 + (seed % 20)).toFixed(1)),
+      impressions: Math.round(1350000 * userMultiplier),
+      purchasesFromAds: Math.round(5670 * userMultiplier)
+    }
   };
 
   const base = baseValues[timeRange];
   
-  // Generate trends based on time range
+  // Generate trends based on time range with user-specific variations
+  const trendVariation = (seed % 20) / 10 - 1; // -1 to +1 variation
   const trends = {
-    last7days: { revenue: 12.5, orders: 8.2, aov: 4.1, conversion: -2.1 },
-    last30days: { revenue: 15.3, orders: 12.1, aov: 6.2, conversion: 1.5 },
-    last90days: { revenue: 22.8, orders: 18.5, aov: 8.9, conversion: 4.2 }
+    last7days: { 
+      revenue: 12.5 + trendVariation, 
+      orders: 8.2 + trendVariation, 
+      aov: 4.1 + trendVariation, 
+      conversion: -2.1 + trendVariation,
+      returningCustomerRate: 5.2 + trendVariation,
+      impressions: 15.3 + trendVariation,
+      purchasesFromAds: 12.8 + trendVariation
+    },
+    last30days: { 
+      revenue: 15.3 + trendVariation, 
+      orders: 12.1 + trendVariation, 
+      aov: 6.2 + trendVariation, 
+      conversion: 1.5 + trendVariation,
+      returningCustomerRate: 8.5 + trendVariation,
+      impressions: 18.7 + trendVariation,
+      purchasesFromAds: 15.2 + trendVariation
+    },
+    last90days: { 
+      revenue: 22.8 + trendVariation, 
+      orders: 18.5 + trendVariation, 
+      aov: 8.9 + trendVariation, 
+      conversion: 4.2 + trendVariation,
+      returningCustomerRate: 12.3 + trendVariation,
+      impressions: 25.4 + trendVariation,
+      purchasesFromAds: 22.1 + trendVariation
+    }
   };
 
   const trend = trends[timeRange];
@@ -55,35 +120,51 @@ const generateData = (timeRange) => {
       },
       {
         id: 5,
-        title: 'Returning Customers',
-        value: `${(Math.random() * 20 + 25).toFixed(1)}%`,
-        trend: (Math.random() * 10 - 2).toFixed(1),
+        title: 'Returning Customer Rate',
+        value: `${base.returningCustomerRate}%`,
+        trend: parseFloat(trend.returningCustomerRate.toFixed(1)),
         icon: Users,
         bgColor: 'bg-indigo-500'
       },
       {
         id: 6,
         title: 'Ad Spend',
-        value: `$${(base.revenue * 0.35).toLocaleString()}`,
-        trend: (Math.random() * 15 + 5).toFixed(1),
+        value: `$${Math.round(base.revenue * 0.35).toLocaleString()}`,
+        trend: parseFloat((trend.revenue * 0.8).toFixed(1)),
         icon: DollarSign,
         bgColor: 'bg-red-500'
       },
       {
         id: 7,
         title: 'ROAS',
-        value: `${(Math.random() + 2.5).toFixed(1)}x`,
-        trend: (Math.random() * 8 + 2).toFixed(1),
+        value: `${(2.5 + (seed % 20) / 10).toFixed(1)}x`,
+        trend: parseFloat((trend.revenue * 0.4).toFixed(1)),
         icon: TrendingUp,
         bgColor: 'bg-emerald-500'
       },
       {
         id: 8,
-        title: 'CTR',
-        value: `${(Math.random() + 1.5).toFixed(1)}%`,
-        trend: (Math.random() * 6 - 3).toFixed(1),
+        title: 'Impressions',
+        value: base.impressions.toLocaleString(),
+        trend: parseFloat(trend.impressions.toFixed(1)),
         icon: Eye,
         bgColor: 'bg-amber-500'
+      },
+      {
+        id: 9,
+        title: 'CTR',
+        value: `${(1.5 + (seed % 15) / 10).toFixed(1)}%`,
+        trend: parseFloat((trend.impressions * 0.3).toFixed(1)),
+        icon: Target,
+        bgColor: 'bg-cyan-500'
+      },
+      {
+        id: 10,
+        title: 'Purchases from Ads',
+        value: base.purchasesFromAds.toLocaleString(),
+        trend: parseFloat(trend.purchasesFromAds.toFixed(1)),
+        icon: Zap,
+        bgColor: 'bg-pink-500'
       }
     ],
     charts: [
@@ -194,9 +275,9 @@ const generateCampaignData = (timeRange) => {
   }));
 };
 
-// Export functions to get data by time range
-export const getDataByTimeRange = (timeRange) => {
-  return generateData(timeRange);
+// Export functions to get data by time range with user ID
+export const getDataByTimeRange = (timeRange, userId = null) => {
+  return generateData(timeRange, userId);
 };
 
 // Keep original data structure for backward compatibility

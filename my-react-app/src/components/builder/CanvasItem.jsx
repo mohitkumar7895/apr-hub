@@ -13,8 +13,9 @@ import {
   TrendingUp,
   Move
 } from 'lucide-react';
+import { LineChart as RechartsLineChart, Line, BarChart as RechartsBarChart, Bar, PieChart as RechartsPieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const CanvasItem = ({ item, isSelected, onSelect, onUpdate, onRemove, onPositionChange }) => {
+const CanvasItem = ({ item, isSelected, onSelect, onUpdate, onRemove, onPositionChange, isPreviewMode = false }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: 'canvas-item',
     item: { id: item.id, type: item.type },
@@ -23,14 +24,17 @@ const CanvasItem = ({ item, isSelected, onSelect, onUpdate, onRemove, onPosition
     }),
     end: (draggedItem, monitor) => {
       const dropResult = monitor.getDropResult();
-      if (dropResult && dropResult.position) {
+      if (dropResult && dropResult.position && !isPreviewMode) {
         onPositionChange(dropResult.position);
       }
     },
+    canDrag: !isPreviewMode,
   }));
 
   const renderItemContent = () => {
-    const baseClasses = "bg-white rounded-xl border-2 transition-all cursor-move shadow-sm";
+    const baseClasses = `bg-white rounded-xl border-2 transition-all shadow-sm ${
+      isPreviewMode ? 'cursor-default' : 'cursor-move'
+    }`;
     const selectedClasses = isSelected 
       ? "border-blue-500 shadow-lg ring-2 ring-blue-200" 
       : "border-gray-200 hover:border-gray-300 hover:shadow-md";
@@ -64,78 +68,119 @@ const CanvasItem = ({ item, isSelected, onSelect, onUpdate, onRemove, onPosition
         );
 
       case 'lineChart':
+        const lineData = [
+          { name: 'Mon', value: 3200 },
+          { name: 'Tue', value: 4500 },
+          { name: 'Wed', value: 3800 },
+          { name: 'Thu', value: 5200 },
+          { name: 'Fri', value: 4800 },
+          { name: 'Sat', value: 6100 },
+          { name: 'Sun', value: 5500 }
+        ];
         return (
           <div className={`${baseClasses} ${selectedClasses} p-5 w-80`}>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h4 className="font-semibold text-gray-900">{item.config.title}</h4>
-                <p className="text-sm text-gray-500">Track performance over time</p>
+                <h4 className="font-semibold text-gray-900">{item.config.title || 'Line Chart'}</h4>
+                <p className="text-sm text-gray-500">{item.config.description || 'Track performance over time'}</p>
               </div>
               <LineChart className="w-5 h-5 text-purple-500" />
             </div>
-            <div className="h-40 bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg border border-gray-100 flex items-center justify-center">
-              <div className="text-center w-full">
-                <div className="flex items-end justify-center space-x-1 h-20 mb-4">
-                  {[30, 45, 60, 75, 65, 80, 95].map((height, index) => (
-                    <div 
-                      key={index}
-                      className="w-3 bg-purple-400 rounded-t transition-all hover:bg-purple-500"
-                      style={{ height: `${height}%` }}
-                    ></div>
-                  ))}
-                </div>
-                <span className="text-gray-600 text-sm">Interactive Line Chart</span>
-              </div>
+            <div className="h-40">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsLineChart data={lineData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="name" stroke="#6b7280" fontSize={12} />
+                  <YAxis stroke="#6b7280" fontSize={12} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                    formatter={(value) => [`$${value.toLocaleString()}`, 'Value']}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="value" 
+                    stroke="#8b5cf6" 
+                    strokeWidth={2}
+                    dot={{ fill: '#8b5cf6', r: 4 }}
+                  />
+                </RechartsLineChart>
+              </ResponsiveContainer>
             </div>
           </div>
         );
 
       case 'barChart':
+        const barData = [
+          { name: 'Product A', sales: 3200 },
+          { name: 'Product B', sales: 2800 },
+          { name: 'Product C', sales: 4500 },
+          { name: 'Product D', sales: 3800 },
+          { name: 'Product E', sales: 5200 }
+        ];
         return (
           <div className={`${baseClasses} ${selectedClasses} p-5 w-80`}>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h4 className="font-semibold text-gray-900">{item.config.title}</h4>
-                <p className="text-sm text-gray-500">Compare product performance</p>
+                <h4 className="font-semibold text-gray-900">{item.config.title || 'Bar Chart'}</h4>
+                <p className="text-sm text-gray-500">{item.config.description || 'Compare product performance'}</p>
               </div>
               <BarChart3 className="w-5 h-5 text-green-500" />
             </div>
-            <div className="h-40 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border border-gray-100 flex items-center justify-center">
-              <div className="text-center w-full">
-                <div className="flex items-end justify-center space-x-3 h-20 mb-4">
-                  {['A', 'B', 'C', 'D'].map((product, index) => (
-                    <div key={product} className="flex flex-col items-center">
-                      <div 
-                        className="w-6 bg-green-400 rounded-t transition-all hover:bg-green-500"
-                        style={{ height: `${40 + index * 15}%` }}
-                      ></div>
-                      <span className="text-xs text-gray-600 mt-1">{product}</span>
-                    </div>
-                  ))}
-                </div>
-                <span className="text-gray-600 text-sm">Product Performance</span>
-              </div>
+            <div className="h-40">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsBarChart data={barData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="name" stroke="#6b7280" fontSize={11} />
+                  <YAxis stroke="#6b7280" fontSize={12} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                    formatter={(value) => [`$${value.toLocaleString()}`, 'Sales']}
+                  />
+                  <Bar dataKey="sales" fill="#10b981" radius={[8, 8, 0, 0]} />
+                </RechartsBarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         );
 
       case 'pieChart':
+        const pieData = [
+          { name: 'Direct', value: 35, color: '#f97316' },
+          { name: 'Social', value: 25, color: '#ef4444' },
+          { name: 'Email', value: 20, color: '#ec4899' },
+          { name: 'Ads', value: 20, color: '#8b5cf6' }
+        ];
         return (
           <div className={`${baseClasses} ${selectedClasses} p-5 w-72`}>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h4 className="font-semibold text-gray-900">{item.config.title}</h4>
-                <p className="text-sm text-gray-500">Revenue distribution</p>
+                <h4 className="font-semibold text-gray-900">{item.config.title || 'Pie Chart'}</h4>
+                <p className="text-sm text-gray-500">{item.config.description || 'Revenue distribution'}</p>
               </div>
               <PieChart className="w-5 h-5 text-orange-500" />
             </div>
-            <div className="h-40 bg-gradient-to-br from-orange-50 to-red-50 rounded-lg border border-gray-100 flex items-center justify-center">
-              <div className="text-center">
-                <div className="w-20 h-20 rounded-full border-4 border-orange-300 flex items-center justify-center mx-auto mb-3">
-                  <span className="text-xs text-gray-600">Chart</span>
-                </div>
-                <span className="text-gray-600 text-sm">Pie Chart Preview</span>
-              </div>
+            <div className="h-40">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsPieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={60}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                  />
+                </RechartsPieChart>
+              </ResponsiveContainer>
             </div>
           </div>
         );
@@ -213,14 +258,16 @@ const CanvasItem = ({ item, isSelected, onSelect, onUpdate, onRemove, onPosition
         top: item.position?.y || 0,
       }}
       onClick={(e) => {
-        e.stopPropagation();
-        onSelect();
+        if (!isPreviewMode) {
+          e.stopPropagation();
+          onSelect();
+        }
       }}
     >
       {renderItemContent()}
       
       {/* Selection Handle */}
-      {isSelected && (
+      {isSelected && !isPreviewMode && (
         <div className="absolute -top-2 -right-2 flex space-x-1">
           <button
             onClick={(e) => {

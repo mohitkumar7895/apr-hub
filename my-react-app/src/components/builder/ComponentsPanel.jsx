@@ -21,17 +21,17 @@ const DraggableComponent = ({ type, icon: Icon, title, description, defaultConfi
   return (
     <div
       ref={drag}
-      className={`p-4 border border-gray-200 rounded-lg bg-white cursor-grab hover:shadow-md transition-all ${
+      className={`p-3 sm:p-4 border border-gray-200 rounded-lg bg-white cursor-grab hover:shadow-md transition-all ${
         isDragging ? 'opacity-50 shadow-lg' : 'opacity-100'
       }`}
     >
-      <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-          <Icon className="w-5 h-5 text-blue-600" />
+      <div className="flex items-center space-x-2 sm:space-x-3">
+        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+          <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-gray-900 truncate">{title}</h3>
-          <p className="text-sm text-gray-500 truncate">{description}</p>
+          <h3 className="text-xs sm:text-sm font-medium text-gray-900 truncate">{title}</h3>
+          <p className="text-xs text-gray-500 truncate hidden sm:block">{description}</p>
         </div>
       </div>
     </div>
@@ -126,41 +126,47 @@ const ComponentsPanel = ({ onAddItem }) => {
   ];
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">Components</h2>
-        <p className="text-sm text-gray-500">
-          Drag components to the canvas to build your report
+    <div className="p-4 sm:p-6">
+      <div className="mb-4 sm:mb-6">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">Components</h2>
+        <p className="text-xs sm:text-sm text-gray-500">
+          Drag components to the canvas
         </p>
       </div>
       
-      <div className="space-y-3">
-        <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide">Metrics</h3>
-        {components.filter(comp => comp.type === 'metric').map((component) => (
-          <DraggableComponent
-            key={`${component.type}-${component.title}`}
-            {...component}
-            onAddItem={onAddItem}
-          />
-        ))}
+      <div className="space-y-2 sm:space-y-3">
+        <h3 className="text-xs sm:text-sm font-medium text-gray-700 uppercase tracking-wide">Metrics</h3>
+        <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3">
+          {components.filter(comp => comp.type === 'metric').map((component) => (
+            <DraggableComponent
+              key={`${component.type}-${component.title}`}
+              {...component}
+              onAddItem={onAddItem}
+            />
+          ))}
+        </div>
         
-        <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide mt-6">Charts</h3>
-        {components.filter(comp => comp.type.includes('Chart')).map((component) => (
-          <DraggableComponent
-            key={`${component.type}-${component.title}`}
-            {...component}
-            onAddItem={onAddItem}
-          />
-        ))}
+        <h3 className="text-xs sm:text-sm font-medium text-gray-700 uppercase tracking-wide mt-4 sm:mt-6">Charts</h3>
+        <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3">
+          {components.filter(comp => comp.type.includes('Chart')).map((component) => (
+            <DraggableComponent
+              key={`${component.type}-${component.title}`}
+              {...component}
+              onAddItem={onAddItem}
+            />
+          ))}
+        </div>
         
-        <h3 className="text-sm font-medium text-gray-700 uppercase tracking-wide mt-6">Other</h3>
-        {components.filter(comp => !comp.type.includes('Chart') && comp.type !== 'metric').map((component) => (
-          <DraggableComponent
-            key={`${component.type}-${component.title}`}
-            {...component}
-            onAddItem={onAddItem}
-          />
-        ))}
+        <h3 className="text-xs sm:text-sm font-medium text-gray-700 uppercase tracking-wide mt-4 sm:mt-6">Other</h3>
+        <div className="grid grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3">
+          {components.filter(comp => !comp.type.includes('Chart') && comp.type !== 'metric').map((component) => (
+            <DraggableComponent
+              key={`${component.type}-${component.title}`}
+              {...component}
+              onAddItem={onAddItem}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

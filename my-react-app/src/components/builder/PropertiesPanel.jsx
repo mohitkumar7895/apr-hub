@@ -30,20 +30,20 @@ const PropertiesPanel = ({ item, onUpdate, onRemove }) => {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="p-6 border-b border-gray-200 bg-white">
-        <div className="flex items-center space-x-3 mb-2">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-            <span className="text-white text-lg">{getIcon(item.type)}</span>
+      <div className="p-4 sm:p-6 border-b border-gray-200 bg-white">
+        <div className="flex items-center space-x-2 sm:space-x-3 mb-2">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+            <span className="text-white text-base sm:text-lg">{getIcon(item.type)}</span>
           </div>
-          <div className="flex-1">
-            <h2 className="text-lg font-bold text-gray-900 capitalize">{item.type} Settings</h2>
-            <p className="text-sm text-gray-500">Configure your component</p>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 capitalize truncate">{item.type} Settings</h2>
+            <p className="text-xs sm:text-sm text-gray-500">Configure your component</p>
           </div>
         </div>
       </div>
 
       {/* Properties Form */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
         {/* Component Type Info */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center justify-between">
